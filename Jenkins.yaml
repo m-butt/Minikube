@@ -1,0 +1,29 @@
+pipeline:
+  agent:
+    any
+  stages:
+    - stage: SyncRepo
+      steps:
+        - sh 'git pull'
+
+    - stage: BuildDockerImage
+      steps:
+        - sh 'docker build -t coin-changer .'
+    
+    - stage: Setting minikube env
+      steps:
+        -sh 'eval $(minikube docker-env)'
+    
+    - stage: Copy docker image in minikube registory
+      steps:
+        -sh 'docker build -t coin-changer .'
+
+    - stage: DeployToKubernetes
+      steps:
+        - sh 'kubectl create -f deployment.yaml'
+
+    - stage: WaitForDeployment
+      steps:
+        - sh 'kubectl get pods'
+
+    
